@@ -1,0 +1,39 @@
+# Personal configuration, appointment history, and cached office discovery
+/termin_config.json
+/.doctolib_ledger.json
+/.offices_*.json
+
+# Persistent browser cookies/session data and diagnostic captures
+/.dl_profile/
+/debug/
+/termin_monitor.log*
+
+# Python bytecode, local environments, and development caches
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Generated distribution artifacts
+/build/
+/dist/
+*.egg-info/
+
+# Local credentials; sanitized examples may be committed
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Local OS/editor artifacts
+.DS_Store
+.idea/
+*.swp
+*.swo
+*~
