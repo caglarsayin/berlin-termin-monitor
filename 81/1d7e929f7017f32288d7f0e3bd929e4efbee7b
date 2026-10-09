@@ -1,0 +1,19 @@
+.gitignore
+  s_4b2f54358910e2::t_d87098c9d5d2d0 1-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "811d7e929f7017f32288d7f0e3bd929e4efbee7b",
+  "prompts": {},
+  "sessions": {
+    "s_4b2f54358910e2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a12285-76d3-7af2-ae7f-0f29ad61a554",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Kamil Morcay <mkmorcay@gmail.com>"
+    }
+  }
+}
