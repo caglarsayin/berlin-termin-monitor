@@ -1,0 +1,97 @@
+termin/ui/dashboard.py
+  s_4b2f54358910e2::t_dd3e5b7627c949 5
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-4,6-118,120-134,136-192,194-236
+  s_4b2f54358910e2::t_e66f9773046299 119,135,193
+termin/app.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-97,99-164
+  s_4b2f54358910e2::t_e66f9773046299 98
+termin/diagnostics.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-3,5-23
+  s_4b2f54358910e2::t_dd3e5b7627c949 4
+docs/development.md
+  s_4b2f54358910e2::t_5b42481384bfaa 1-2,6-52
+  s_4b2f54358910e2::t_0a721a2af5267c 3-5
+termin/workers/__init__.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1
+termin/ui/setup.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-176,178-299,301-346,348-386
+  s_4b2f54358910e2::t_e66f9773046299 177,300,347
+termin/model.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-29,31-52
+  s_4b2f54358910e2::t_e66f9773046299 30
+termin/paths.py
+  s_4b2f54358910e2::t_77f44c6d990789 1,17-19
+  s_4b2f54358910e2::t_f6a40764b9f18c 2-3,5-12,14-15
+  s_4b2f54358910e2::t_e66f9773046299 13,16
+  s_4b2f54358910e2::t_dd3e5b7627c949 4
+termin/providers/doctolib.py
+  s_4b2f54358910e2::t_dd3e5b7627c949 3,6
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-2,4-5,7-8,10-13,15-92,94-133,135-138,140-206
+  s_4b2f54358910e2::t_eaeda7dd8840a3 9
+  s_4b2f54358910e2::t_e66f9773046299 14,93,134,139
+termin/ledger.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-5,7-8,10-39,41-68
+  s_4b2f54358910e2::t_e66f9773046299 6,9,40
+termin/workers/berlin.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-7,9-106,108-127
+  s_4b2f54358910e2::t_dd3e5b7627c949 8
+  s_4b2f54358910e2::t_e66f9773046299 107,128
+termin/ui/__init__.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1
+termin/__init__.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1
+tests/test_core.py
+  s_4b2f54358910e2::t_8ea11664d2cc7d 1-163
+termin/providers/berlin.py
+  s_4b2f54358910e2::t_dd3e5b7627c949 9-10
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-8,11,13-118,120-134,136-166,168-173,175-181,183-194,196-212
+  s_4b2f54358910e2::t_e66f9773046299 119,135,167,174,182,195
+  s_4b2f54358910e2::t_77f44c6d990789 12
+termin_monitor.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-8
+tests/test_monitoring.py
+  s_4b2f54358910e2::t_72077c1d7a060d 1-183
+termin/alerts.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-16
+termin/terminal.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-55,57-65,68-215
+  s_4b2f54358910e2::t_e66f9773046299 56,66-67
+termin/providers/__init__.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1
+start
+  s_4b2f54358910e2::t_0a721a2af5267c 1-21
+termin/cli.py
+  s_4b2f54358910e2::t_dd3e5b7627c949 23
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-22,24-114,116-117
+  s_4b2f54358910e2::t_e66f9773046299 115
+termin/workers/doctolib.py
+  s_4b2f54358910e2::t_e66f9773046299 44,49,100,116,152,160,164-165,190,221
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-8,10-13,16-43,45-48,50-99,101-115,117-151,153-159,161-163,166-189,191-220
+  s_4b2f54358910e2::t_dd3e5b7627c949 9
+  s_4b2f54358910e2::t_77f44c6d990789 14-15
+README.md
+  s_4b2f54358910e2::t_ea34ba7a8ded38 1-2,4,8,10,18,20,22,24-25,29-30,33,37,39,41-42,44
+  s_4b2f54358910e2::t_90895e2c58cf89 26-27
+  s_4b2f54358910e2::t_0a721a2af5267c 28,31-32,43,45-46
+  s_4b2f54358910e2::t_d87098c9d5d2d0 47
+  s_4b2f54358910e2::t_5b42481384bfaa 3,5-7,13,21,23,34-36,38,40,48
+  s_4b2f54358910e2::t_67a1ecc7e1454f 9,11-12,14-17,19
+termin/storage.py
+  s_4b2f54358910e2::t_f6a40764b9f18c 1-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "cf2764c41961a5ca0970154b5eeae28b2c84a12a",
+  "prompts": {},
+  "sessions": {
+    "s_4b2f54358910e2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a12285-76d3-7af2-ae7f-0f29ad61a554",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Kamil Morcay <mkmorcay@gmail.com>"
+    }
+  }
+}
