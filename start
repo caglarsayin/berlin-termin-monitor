@@ -1,0 +1,21 @@
+#!/bin/sh
+set -eu
+
+PROJECT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+VENV_PYTHON="$PROJECT_DIR/.venv/bin/python"
+
+if [ ! -x "$VENV_PYTHON" ]; then
+    if ! command -v python3 >/dev/null 2>&1; then
+        echo "Python 3 is required. Install it, then run ./start again." >&2
+        exit 1
+    fi
+    echo "Creating the local Python environment…"
+    python3 -m venv "$PROJECT_DIR/.venv"
+fi
+
+if ! "$VENV_PYTHON" -c 'import playwright.sync_api' >/dev/null 2>&1; then
+    echo "Installing Playwright…"
+    "$VENV_PYTHON" -m pip install playwright
+fi
+
+exec "$VENV_PYTHON" "$PROJECT_DIR/termin_monitor.py" "$@"
