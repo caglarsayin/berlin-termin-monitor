@@ -1,0 +1,31 @@
+termin/workers/doctolib.py
+  s_8c7db02027bffb::t_df5da13448523b 13,112,114
+  s_8c7db02027bffb::t_de2de71b562538 113,115
+tests/test_core.py
+  s_8c7db02027bffb::t_df5da13448523b 164-173
+termin/cli.py
+  s_8c7db02027bffb::t_de2de71b562538 62-64,114-122
+  s_8c7db02027bffb::t_df5da13448523b 65-66
+  s_8c7db02027bffb::t_5d31ee2cfe1264 123-124
+README.md
+  s_8c7db02027bffb::t_5bc0fb903b5df5 48-58
+termin/ledger.py
+  s_8c7db02027bffb::t_df5da13448523b 3,12-27
+  s_8c7db02027bffb::t_1bf8be409149fc 28-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "d4b6afc52b3e834ede4bd9460d46bd9a5ce41043",
+  "prompts": {},
+  "sessions": {
+    "s_8c7db02027bffb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "38cb1a57-d6d8-4689-adf7-87890ed7ccb6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "caglar sayin <caglar.sayin@deliveryhero.com>"
+    }
+  }
+}
