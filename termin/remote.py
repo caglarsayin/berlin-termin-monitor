@@ -20,7 +20,7 @@ import urllib.error
 import urllib.request
 
 from termin.diagnostics import log_debug
-from termin.providers.doctolib import clean_wizard_url, suggest_label
+from termin.providers.doctolib import clean_wizard_url, is_doctolib_url, suggest_label
 
 TIMEOUT = 15
 DEFAULT_ENTITIES = {
@@ -69,16 +69,25 @@ def _doctor_items():
     return service_response.get(_entity("doctors"), {}).get("items", [])
 
 
+def _safe_label(text):
+    """Printable, length-limited display name (labels come from user-editable HA data)."""
+    cleaned = "".join(ch for ch in str(text) if ch.isprintable() and ch not in '"\\`$')
+    return " ".join(cleaned.split())[:60] or "doctolib watch"
+
+
 def _doctor_from_item(item):
     """Return (label, url) for a to-do item, tidying pasted-URL items in HA."""
     summary = (item.get("summary") or "").strip()
     description = (item.get("description") or "").strip()
-    if "doctolib." in description:
-        return summary or suggest_label(clean_wizard_url(description)), clean_wizard_url(description)
-    if "doctolib." not in summary:
+    if is_doctolib_url(description):
+        url = clean_wizard_url(description)
+        return _safe_label(summary or suggest_label(url)), url
+    if not is_doctolib_url(summary):
+        if "doctolib" in summary.lower() or "doctolib" in description.lower():
+            log_debug("remote: ignored doctor item without an https://…doctolib.<tld> URL")
         return None
     url = clean_wizard_url(summary)
-    label = suggest_label(url)
+    label = _safe_label(suggest_label(url))
     try:
         _call("POST", "/api/services/todo/update_item",
               {"entity_id": _entity("doctors"), "item": item["uid"], "rename": label, "description": url})
@@ -122,6 +131,9 @@ def sync_watches(watches, doctors):
     by_url = {w["book"]: w for w in watches}
     wanted = []
     for label, url in doctors:
+        if not is_doctolib_url(url):
+            continue
+        label = _safe_label(label)
         w = by_url.get(url) or {"name": label, "book": url, "feed": None, "paused": False,
                                 "sid": f"dl{abs(hash(url)) % 10**8}"}
         w["name"] = label

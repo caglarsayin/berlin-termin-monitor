@@ -48,8 +48,11 @@ def play_sound(path, times=1):
 def notify(title, message, url=None):
     post_webhook({"event": "alert", "title": title, "message": message, "url": url})
     if shutil.which("osascript"):
-        script = f'display notification "{message}" with title "{title}" sound name "Hero"'
-        subprocess.run(["osascript", "-e", script], check=False)
+        # Text goes in as argv, never into the script source (no AppleScript injection).
+        subprocess.run(["osascript",
+                        "-e", "on run argv",
+                        "-e", 'display notification (item 1 of argv) with title (item 2 of argv) sound name "Hero"',
+                        "-e", "end run", str(message), str(title)], check=False)
 
 
 def report_status(name, state):

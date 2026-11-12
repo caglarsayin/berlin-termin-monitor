@@ -21,6 +21,20 @@ def clean_wizard_url(url):
                        p.path, urlencode(q), ""))
 
 
+DOCTOLIB_TLDS = ("de", "fr", "it", "nl")
+
+
+def is_doctolib_url(url):
+    """True only for https URLs on a real Doctolib host (doctolib.<tld> or a subdomain)."""
+    try:
+        p = urlsplit((url or "").strip())
+    except ValueError:
+        return False
+    host = (p.hostname or "").lower()
+    return p.scheme == "https" and any(
+        host == f"doctolib.{tld}" or host.endswith(f".doctolib.{tld}") for tld in DOCTOLIB_TLDS)
+
+
 def suggest_label(url):
     segs = [s for s in urlsplit(url).path.split("/") if s]
     if "booking" in segs:

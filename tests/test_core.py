@@ -312,3 +312,32 @@ class RemoteSettingsTests(unittest.TestCase):
         from termin import remote
         with patch.dict("os.environ", {"TERMIN_HA_URL": "http://127.0.0.1:9", "TERMIN_HA_TOKEN": "t"}):
             self.assertIsNone(remote.fetch_settings())
+
+
+class DoctolibUrlValidationTests(unittest.TestCase):
+    def test_only_https_doctolib_hosts(self):
+        from termin.providers.doctolib import is_doctolib_url
+        self.assertTrue(is_doctolib_url("https://www.doctolib.de/x/booking"))
+        self.assertTrue(is_doctolib_url("https://doctolib.fr/x"))
+        for bad in ("http://www.doctolib.de/x", "https://evil.example/doctolib.de",
+                    "https://doctolib.de.evil.example/x", "https://notdoctolib.de/x",
+                    "file:///etc/passwd", "", None):
+            self.assertFalse(is_doctolib_url(bad), bad)
+
+    def test_sync_watches_rejects_foreign_urls_and_cleans_labels(self):
+        from termin import remote
+        watches = []
+        remote.sync_watches(watches, [('Evil" & do shell script "x', "https://www.doctolib.de/a"),
+                                      ("Bad", "https://evil.example/doctolib.de")])
+        self.assertEqual(len(watches), 1)
+        self.assertNotIn('"', watches[0]["name"])
+
+    def test_notify_passes_text_as_arguments(self):
+        from termin import alerts
+        with patch.dict("os.environ", {"TERMIN_WEBHOOK_URL": ""}), \
+                patch.object(alerts.shutil, "which", return_value="/usr/bin/osascript"), \
+                patch.object(alerts.subprocess, "run") as run:
+            alerts.notify('T"itle', 'Msg" & do shell script "touch /tmp/pwned')
+        argv = run.call_args[0][0]
+        self.assertEqual(argv[-2:], ['Msg" & do shell script "touch /tmp/pwned', 'T"itle'])
+        self.assertTrue(all("pwned" not in a for a in argv[:-2]))
