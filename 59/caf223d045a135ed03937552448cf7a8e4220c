@@ -1,0 +1,25 @@
+termin/alerts.py
+  s_8c7db02027bffb::t_48d804f2c467fd 51-55
+termin/providers/doctolib.py
+  s_8c7db02027bffb::t_722a02512518a9 24-37
+termin/remote.py
+  s_8c7db02027bffb::t_f1c6cbea9a3073 23,72-77,82-87,90,134-136
+tests/test_core.py
+  s_8c7db02027bffb::t_c09f6442abd07e 315-343
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "59caf223d045a135ed03937552448cf7a8e4220c",
+  "prompts": {},
+  "sessions": {
+    "s_8c7db02027bffb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "38cb1a57-d6d8-4689-adf7-87890ed7ccb6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "caglar sayin <caglar.sayin@deliveryhero.com>"
+    }
+  }
+}
