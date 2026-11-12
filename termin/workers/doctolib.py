@@ -12,7 +12,7 @@ from termin.alerts import notify, play_sound, report_status
 from termin.diagnostics import log_debug
 from termin.ledger import _dl_summarize, _fmt_date, dl_apply_poll, filter_dl_slots
 from termin.paths import DL_PROFILE_DIR, SOURCE_FILE, SRC_MTIME, UA
-from termin.providers.doctolib import dl_check, dl_load
+from termin.providers.doctolib import clear_stale_profile_lock, dl_check, dl_load
 from termin.storage import (
     _save_cfg_patch,
     load_config,
@@ -61,6 +61,7 @@ def doctolib_worker(model, args, on_update):
                     ok_count = fail_count = 0
                     try:
                         if ctx is None:
+                            clear_stale_profile_lock()
                             try:
                                 ctx = p.chromium.launch_persistent_context(
                                     str(DL_PROFILE_DIR), channel="chrome",

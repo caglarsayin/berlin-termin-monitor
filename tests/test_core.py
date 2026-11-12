@@ -219,3 +219,21 @@ class WebhookAlertTests(unittest.TestCase):
         from termin import alerts
         with patch.dict("os.environ", {"TERMIN_WEBHOOK_URL": "http://127.0.0.1:9/x"}):
             self.assertFalse(alerts.post_webhook({"event": "status"}))
+
+
+class StaleProfileLockTests(unittest.TestCase):
+    def test_removes_lock_from_other_host_only(self):
+        import os
+        import socket
+        from termin.providers.doctolib import clear_stale_profile_lock
+        with tempfile.TemporaryDirectory() as d:
+            prof = Path(d)
+            os.symlink("old-container-19", prof / "SingletonLock")
+            os.symlink("/tmp/x/SingletonSocket", prof / "SingletonSocket")
+            os.symlink("123", prof / "SingletonCookie")
+            self.assertTrue(clear_stale_profile_lock(prof))
+            self.assertEqual(sorted(os.listdir(prof)), [])
+            os.symlink(f"{socket.gethostname()}-42", prof / "SingletonLock")
+            self.assertFalse(clear_stale_profile_lock(prof))
+            self.assertTrue((prof / "SingletonLock").is_symlink())
+            self.assertFalse(clear_stale_profile_lock(Path(d) / "missing"))

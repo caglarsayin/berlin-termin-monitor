@@ -12,6 +12,9 @@ services:
     build: .
     image: termin-monitor:local
     container_name: termin-monitor
+    # Stable hostname: Chrome's profile lock records it, so a recreated
+    # container must not look like "another computer".
+    hostname: termin-monitor
     restart: unless-stopped
     environment:
       TERMIN_WEBHOOK_URL: ${TERMIN_WEBHOOK_URL:-}

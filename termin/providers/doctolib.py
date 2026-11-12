@@ -1,6 +1,8 @@
 """Doctolib booking URLs, browser navigation, and availability-feed parsing."""
 
 import json
+import os
+import socket
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
@@ -180,9 +182,32 @@ def dl_check(page, watch):
     return sorted(slots), nxt, feed, None
 
 
+def clear_stale_profile_lock(profile=DL_PROFILE_DIR):
+    """Remove Chrome's singleton lock left by another host (e.g. a recreated container).
+
+    Chrome refuses a profile whose SingletonLock ('<hostname>-<pid>') names a
+    different host. Locks from this host are left for Chrome to validate itself.
+    Returns True when a stale lock was removed."""
+    lock = Path(profile) / "SingletonLock"
+    try:
+        target = os.readlink(lock)
+    except OSError:
+        return False
+    if target.rsplit("-", 1)[0] == socket.gethostname():
+        return False
+    for name in ("SingletonLock", "SingletonSocket", "SingletonCookie"):
+        try:
+            (Path(profile) / name).unlink()
+        except FileNotFoundError:
+            pass
+    log_debug(f"removed stale browser profile lock from host {target.rsplit('-', 1)[0]}")
+    return True
+
+
 def dl_probe(wizard_url):
     """One-shot discovery used by the add-a-doctor flow."""
     from playwright.sync_api import sync_playwright
+    clear_stale_profile_lock()
     with sync_playwright() as p:
         browser = p.chromium.launch_persistent_context(
             str(DL_PROFILE_DIR), channel="chrome", headless=True,
