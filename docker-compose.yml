@@ -1,0 +1,33 @@
+# Portainer: Stacks → Add stack → Repository, compose path "docker-compose.yml".
+# Set these as stack environment variables (they are not stored in Git):
+#   TERMIN_DATA_PATH    required: absolute host folder for runtime data
+#                       (config, slot history, browser profile, logs)
+#   TERMIN_WEBHOOK_URL  optional: e.g. a Home Assistant webhook
+#                       http://<ha-host>:8123/api/webhook/<id>
+#   TERMIN_BETWEEN      time window HH:MM-HH:MM (default 17:00-20:00)
+#   TERMIN_DAYS         look-ahead in days (default 14)
+#   TERMIN_INTERVAL     seconds between checks (default 240)
+services:
+  termin-monitor:
+    build: .
+    image: termin-monitor:local
+    container_name: termin-monitor
+    restart: unless-stopped
+    environment:
+      TERMIN_WEBHOOK_URL: ${TERMIN_WEBHOOK_URL:-}
+    command:
+      - --between
+      - ${TERMIN_BETWEEN:-17:00-20:00}
+      - --days
+      - ${TERMIN_DAYS:-14}
+      - --interval
+      - ${TERMIN_INTERVAL:-240}
+    volumes:
+      - ${TERMIN_DATA_PATH:?set TERMIN_DATA_PATH to an absolute host folder}:/data
+    shm_size: 512mb
+    mem_limit: 1g
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "3"

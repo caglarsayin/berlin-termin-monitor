@@ -9,7 +9,7 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 
-from termin.paths import SCRIPT_DIR, UA
+from termin.paths import DATA_DIR, UA
 from termin.storage import _upgrade_office
 from termin.terminal import DIM, YELLOW, c
 
@@ -113,7 +113,7 @@ def fetch_office(service_id, sid):
 
 def discover(service_id, use_cache=True):
     """Return (service_name, [office, ...]) for a Dienstleistung, cached 7 days."""
-    cache_file = SCRIPT_DIR / f".offices_{service_id}.json"
+    cache_file = DATA_DIR / f".offices_{service_id}.json"
     if use_cache and cache_file.exists():
         cached = json.loads(cache_file.read_text())
         # Invalidate caches built with an older discovery parser.

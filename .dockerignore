@@ -1,0 +1,9 @@
+.git
+.venv
+.dl_profile
+debug
+tests
+docs
+*.log
+*.json
+__pycache__
