@@ -237,3 +237,78 @@ class StaleProfileLockTests(unittest.TestCase):
             self.assertFalse(clear_stale_profile_lock(prof))
             self.assertTrue((prof / "SingletonLock").is_symlink())
             self.assertFalse(clear_stale_profile_lock(Path(d) / "missing"))
+
+
+class RemoteSettingsTests(unittest.TestCase):
+    def test_sync_watches_keeps_state_and_adds_unseeded(self):
+        from termin import remote
+        watches = [{"name": "Old", "book": "https://www.doctolib.de/a/booking", "feed": "f", "seeded": True}]
+        changed = remote.sync_watches(watches, [("A", "https://www.doctolib.de/a/booking"),
+                                                ("B", "https://www.doctolib.de/b/booking")])
+        self.assertTrue(changed)
+        self.assertEqual([w["name"] for w in watches], ["A", "B"])
+        self.assertTrue(watches[0]["seeded"])
+        self.assertNotIn("seeded", watches[1])
+        self.assertFalse(remote.sync_watches(watches, [("A", "https://www.doctolib.de/a/booking"),
+                                                       ("B", "https://www.doctolib.de/b/booking")]))
+        self.assertTrue(remote.sync_watches(watches, []))
+        self.assertEqual(watches, [])
+
+    def test_fetch_settings_from_fake_home_assistant(self):
+        import http.server
+        import threading
+        from termin import remote
+        url = "https://www.doctolib.de/physio/berlin/x/booking/availabilities?masterPatientUuid=SECRET&motiveIds%5B%5D=1"
+        updates = []
+        states = {"input_datetime.termin_from": "09:00:00", "input_datetime.termin_to": "12:30:00",
+                  "input_number.termin_days": "7.0", "input_boolean.termin_enabled": "on",
+                  "input_button.termin_check_now": "2026-11-13T10:00:00+00:00"}
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def _send(self, obj):
+                body = json.dumps(obj).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(body)
+
+            def do_GET(self):
+                eid = self.path.rsplit("/", 1)[1]
+                self._send({"entity_id": eid, "state": states[eid]})
+
+            def do_POST(self):
+                body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+                if "get_items" in self.path:
+                    self._send({"service_response": {"todo.termin_doctors": {"items": [
+                        {"uid": "1", "summary": url, "status": "needs_action"},
+                        {"uid": "2", "summary": "just a note", "status": "needs_action"}]}}})
+                else:
+                    updates.append(body)
+                    self._send([])
+
+            def log_message(self, *a):
+                pass
+
+        srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        try:
+            env = {"TERMIN_HA_URL": f"http://127.0.0.1:{srv.server_port}", "TERMIN_HA_TOKEN": "t"}
+            with patch.dict("os.environ", env):
+                self.assertTrue(remote.enabled())
+                s = remote.fetch_settings()
+        finally:
+            srv.shutdown()
+            srv.server_close()
+        self.assertEqual(s["between"], ("09:00", "12:30"))
+        self.assertEqual(s["days"], 7)
+        self.assertTrue(s["enabled"])
+        self.assertEqual(len(s["doctors"]), 1)
+        label, clean = s["doctors"][0]
+        self.assertNotIn("SECRET", clean)
+        self.assertEqual(updates[0]["item"], "1")
+        self.assertEqual(updates[0]["description"], clean)
+
+    def test_unreachable_home_assistant_returns_none(self):
+        from termin import remote
+        with patch.dict("os.environ", {"TERMIN_HA_URL": "http://127.0.0.1:9", "TERMIN_HA_TOKEN": "t"}):
+            self.assertIsNone(remote.fetch_settings())

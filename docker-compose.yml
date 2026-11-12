@@ -4,6 +4,10 @@
 #                       (config, slot history, browser profile, logs)
 #   TERMIN_WEBHOOK_URL  optional: e.g. a Home Assistant webhook
 #                       http://<ha-host>:8123/api/webhook/<id>
+#   TERMIN_HA_URL       optional: Home Assistant base URL, e.g. http://<ha-host>:8123
+#   TERMIN_HA_TOKEN     optional: HA long-lived token; with TERMIN_HA_URL the time
+#                       window, days, pause and doctor list come live from HA
+#                       (see termin/remote.py for the helper entity ids)
 #   TERMIN_BETWEEN      time window HH:MM-HH:MM (default 17:00-20:00)
 #   TERMIN_DAYS         look-ahead in days (default 14)
 #   TERMIN_INTERVAL     seconds between checks (default 240)
@@ -18,6 +22,8 @@ services:
     restart: unless-stopped
     environment:
       TERMIN_WEBHOOK_URL: ${TERMIN_WEBHOOK_URL:-}
+      TERMIN_HA_URL: ${TERMIN_HA_URL:-}
+      TERMIN_HA_TOKEN: ${TERMIN_HA_TOKEN:-}
     command:
       - --between
       - ${TERMIN_BETWEEN:-17:00-20:00}

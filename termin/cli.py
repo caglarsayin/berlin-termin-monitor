@@ -90,8 +90,9 @@ def main():
 
     if not interactive:
         config = load_config() or {}
-        if config.get("mode") == "doctolib" and config.get("doctolib"):
-            model = Model(None, "Doctolib doctors", config["doctolib"],
+        from termin import remote
+        if remote.enabled() or (config.get("mode") == "doctolib" and config.get("doctolib")):
+            model = Model(None, "Doctolib doctors", config.get("doctolib") or [],
                           args.interval, mode="doctolib")
             run_headless(args, model, doctolib_worker)
         else:

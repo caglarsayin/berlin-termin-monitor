@@ -56,4 +56,10 @@ within the next two weeks:
 `--days` ignores slots further ahead. Slots outside the filter are not shown
 and never alert. Both options apply to Doctolib only.
 
+**Home Assistant control (optional):** set `TERMIN_HA_URL` and `TERMIN_HA_TOKEN`
+and the Doctolib monitor reads its time window, look-ahead, pause switch,
+check-now button and doctor list from Home Assistant helpers before every
+check. Paste a booking URL into the `todo.termin_doctors` list to watch a
+doctor; delete the item to stop. See `termin/remote.py` for the entity ids.
+
 [Development notes](docs/development.md)

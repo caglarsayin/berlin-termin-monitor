@@ -8,6 +8,7 @@ import time
 import traceback
 from datetime import datetime
 
+from termin import remote
 from termin.alerts import notify, play_sound, report_status
 from termin.diagnostics import log_debug
 from termin.ledger import _dl_summarize, _fmt_date, dl_apply_poll, filter_dl_slots
@@ -35,9 +36,46 @@ def doctolib_worker(model, args, on_update):
             fail_streak = 0
             cycle_end = None
             try:
+                remote_on = remote.enabled()
+                remote_paused = False
+                last_marker = remote.check_now_marker() if remote_on else None
+                last_marker_poll = time.time()
                 while not model.stopping:
                     if time.time() < model.next_at:
+                        if remote_on and time.time() - last_marker_poll > 30:
+                            last_marker_poll = time.time()
+                            marker = remote.check_now_marker()
+                            if marker and marker != last_marker:
+                                last_marker = marker
+                                model.next_at = 0
+                                model.event("check requested from Home Assistant")
+                                log_debug("remote: check-now pressed")
                         time.sleep(0.2)
+                        continue
+                    if remote_on:
+                        settings = remote.fetch_settings()
+                        if settings is not None:
+                            last_marker = settings["check_now"] or last_marker
+                            args.between = settings["between"] or args.between
+                            args.days = settings["days"] if settings["days"] is not None else args.days
+                            if remote_paused != (not settings["enabled"]):
+                                remote_paused = not settings["enabled"]
+                                model.event("monitoring paused from Home Assistant" if remote_paused
+                                            else "monitoring resumed from Home Assistant", YELLOW)
+                                log_debug(f"remote: paused={remote_paused}")
+                            if remote.sync_watches(model.offices, settings["doctors"]):
+                                model.reset_rows()
+                                save_doctolib(model.offices)
+                                model.event(f"doctor list updated from Home Assistant "
+                                            f"({len(model.offices)} watched)", BLUE)
+                                log_debug("remote: doctors = " + ", ".join(w["name"] for w in model.offices))
+                    if remote_paused or not model.offices:
+                        reason = "paused" if remote_paused else "no doctors"
+                        report_status("—", {"status": "paused", "reason": reason,
+                                            "checked": datetime.now().strftime("%H:%M:%S")})
+                        model.next_at = time.time() + args.interval
+                        if args.once:
+                            break
                         continue
                     model.checking = True
                     model.cycle += 1
