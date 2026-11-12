@@ -8,7 +8,7 @@ import time
 import traceback
 from datetime import datetime
 
-from termin.alerts import notify, play_sound
+from termin.alerts import notify, play_sound, report_status
 from termin.diagnostics import log_debug
 from termin.ledger import _dl_summarize, _fmt_date, dl_apply_poll, filter_dl_slots
 from termin.paths import DL_PROFILE_DIR, SOURCE_FILE, SRC_MTIME, UA
@@ -121,6 +121,7 @@ def doctolib_worker(model, args, on_update):
                                 fail_count += 1
                                 model.event(f"{w['name']}: {fail_reason} — "
                                             f"backing off (press l for logs)", YELLOW)
+                                report_status(w["name"], st)
                                 on_update()
                                 continue
                             was_failing = st.pop("reason", None) is not None
@@ -138,15 +139,17 @@ def doctolib_worker(model, args, on_update):
                             if changed:
                                 save_doctolib(model.offices)
                             _dl_summarize(st, led, nxt, now_ts)
+                            report_status(w["name"], st)
 
                             if new_days:
                                 days_txt = ", ".join(_fmt_date(d) for d in new_days)
                                 model.event(f"🚨 {w['name']}: NEW day {days_txt}",
                                             BOLD + GREEN)
                                 notify(f"Doctolib: {w['name']}",
-                                       f"New bookable day: {days_txt}")
+                                       f"New bookable day: {days_txt}", url=w["book"])
                                 if args.open:
-                                    subprocess.run(["open", w["book"]], check=False)
+                                    if shutil.which("open"):
+                                        subprocess.run(["open", w["book"]], check=False)
                                 on_update()
                                 play_sound(args.sound, times=3)
                             elif new:

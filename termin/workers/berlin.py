@@ -85,7 +85,8 @@ def monitor_worker(model, args, on_update):
                                     model.event(f"🚨 {o['name']}: NEW slot {', '.join(new)}",
                                                 BOLD + GREEN)
                                     notify(f"Slot: {model.service_name}",
-                                           f"{o['name']}: {', '.join(new)}")
+                                           f"{o['name']}: {', '.join(new)}",
+                                           url=booking_url(o))
                                     if args.open:
                                         subprocess.run(["open", booking_url(o)], check=False)
                                     on_update()

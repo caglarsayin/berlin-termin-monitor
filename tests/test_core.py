@@ -171,3 +171,51 @@ class FilterDlSlotsTests(unittest.TestCase):
                  "2026-11-10T20:01", "2026-11-21T18:00", "2026-11-20T18:00"]
         got = filter_dl_slots(slots, "17:00", "20:00", 14, today=date(2026, 11, 6))
         self.assertEqual(got, ["2026-11-07T17:00", "2026-11-10T20:00", "2026-11-20T18:00"])
+
+
+class WebhookAlertTests(unittest.TestCase):
+    def _serve(self):
+        import http.server
+        import threading
+        received = []
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_POST(self):
+                body = self.rfile.read(int(self.headers["Content-Length"]))
+                received.append(json.loads(body))
+                self.send_response(200)
+                self.end_headers()
+
+            def log_message(self, *a):
+                pass
+
+        srv = http.server.HTTPServer(("127.0.0.1", 0), Handler)
+        threading.Thread(target=srv.handle_request, daemon=True).start()
+        return srv, received
+
+    def test_notify_posts_alert_with_url(self):
+        from termin import alerts
+        srv, received = self._serve()
+        url = f"http://127.0.0.1:{srv.server_port}/hook"
+        with patch.dict("os.environ", {"TERMIN_WEBHOOK_URL": url}), \
+                patch.object(alerts.shutil, "which", return_value=None):
+            alerts.notify("Doctolib: X", "New bookable day: 19.11.2026",
+                          url="https://example.org/book")
+        srv.server_close()
+        self.assertEqual(received, [{"event": "alert", "title": "Doctolib: X",
+                                     "message": "New bookable day: 19.11.2026",
+                                     "url": "https://example.org/book"}])
+
+    def test_no_webhook_and_no_macos_tools_is_silent(self):
+        from termin import alerts
+        with patch.dict("os.environ", {"TERMIN_WEBHOOK_URL": ""}), \
+                patch.object(alerts.shutil, "which", return_value=None), \
+                patch.object(alerts.subprocess, "run") as run:
+            alerts.notify("t", "m")
+            alerts.play_sound("/x.aiff", times=3)
+        run.assert_not_called()
+
+    def test_unreachable_webhook_does_not_raise(self):
+        from termin import alerts
+        with patch.dict("os.environ", {"TERMIN_WEBHOOK_URL": "http://127.0.0.1:9/x"}):
+            self.assertFalse(alerts.post_webhook({"event": "status"}))

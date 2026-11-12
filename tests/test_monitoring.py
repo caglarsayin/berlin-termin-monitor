@@ -137,7 +137,8 @@ class WorkerTests(unittest.TestCase):
             notify.assert_not_called()
             model.next_at = 0
             doctolib_worker.doctolib_worker(model, self.args, lambda: None)
-            notify.assert_called_once_with('Doctolib: Example', 'New bookable day: 21.10.2099')
+            notify.assert_called_once_with('Doctolib: Example', 'New bookable day: 21.10.2099',
+                                       url='https://example.test/booking')
             sound.assert_called_once_with('unused', times=3)
             self.assertEqual(save.call_count, 2)
         self.assertEqual(model.cycle, 2)
